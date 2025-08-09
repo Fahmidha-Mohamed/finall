@@ -113,6 +113,13 @@
         0 0 60px #ffb600;
       margin-bottom: 1.2em;
       user-select:none;
+      position: absolute;
+      width: 100%;
+      top: 35%;
+      left: 0;
+      pointer-events:none;
+      z-index: 160;
+      display: none;
     }
   </style>
 </head>
@@ -122,6 +129,7 @@
     <canvas id="stars" width="480" height="640"></canvas>
     <canvas id="game" width="480" height="640"></canvas>
     <canvas id="fireworks" width="480" height="640" style="pointer-events:none; position:absolute; top:0; left:0; z-index:150;"></canvas>
+    <div id="birthday-text">HAPPY BIRTHDAY ZAINUL</div>
   </div>
 
   <div id="overlay" role="dialog" aria-modal="true" aria-labelledby="dialog-text">
@@ -130,7 +138,6 @@
       <button id="yes-button">YES</button>
       <div id="final-message" hidden>Foumi loves you most &lt;3</div>
     </div>
-    <div id="birthday-text" style="display:none;">HAPPY BIRTHDAYY ZAINUL</div>
   </div>
 
 <script>
@@ -365,7 +372,6 @@
 
   // Fireworks logic
 
-  // Firework particle class
   class Particle {
     constructor(x,y,color){
       this.x = x;
@@ -452,8 +458,25 @@
     overlay.style.opacity = '1';
   }
   function hideOverlay(){
-    overlay.style.visibility = 'hidden';
     overlay.style.opacity = '0';
+    setTimeout(() => {
+      overlay.style.visibility = 'hidden';
+    }, 300);
+  }
+
+  // Reset game
+  function resetGame(){
+    nextIndex = 0;
+    basket.x = W/2 - basket.width/2;
+    spawnBee();
+    running = true;
+    showFireworks = false;
+    fireworksStarted = false;
+    birthdayText.style.display = 'none';
+    dialog.style.display = 'none';
+    finalMessage.hidden = true;
+    nextLetterEl.textContent = LETTERS[nextIndex];
+    hideOverlay();
   }
 
   // Yes button event
@@ -462,6 +485,9 @@
     yesButton.style.display = 'none';
     finalMessage.hidden = false;
   };
+
+  // Spawn first bee
+  spawnBee();
 
   // Game loop
   function gameLoop(timestamp){
@@ -494,8 +520,8 @@
             birthdayText.style.display = 'block';
             nextLetterEl.textContent = '';
 
+            // Start fireworks and after duration show overlay
             setTimeout(() => {
-              // Stop fireworks and show dialog
               showFireworks = false;
               birthdayText.style.display = 'none';
               dialog.style.display = 'block';
@@ -503,7 +529,8 @@
               yesButton.style.display = 'inline-block';
               finalMessage.hidden = true;
               showOverlay();
-            }, fireworksDuration + 1500);
+            }, fireworksDuration);
+
           } else {
             spawnBee();
           }
@@ -531,10 +558,7 @@
     requestAnimationFrame(gameLoop);
   }
 
-  // Initialize
-  spawnBee();
   requestAnimationFrame(gameLoop);
-
 })();
 </script>
 </body>
